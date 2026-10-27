@@ -1,0 +1,14 @@
+# AWS Credentials and local secrets
+awsdetails.txt
+*.pem
+*.key
+*.env
+.env*
+policy.json
+oac.json
+
+# OS and Editor
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/

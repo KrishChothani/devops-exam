@@ -1,0 +1,529 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CloudOps CI/CD Automation Hub | GitHub → CodeCommit → CodePipeline → S3</title>
+    <meta name="description" content="Automated CloudOps CI/CD pipeline deployment using GitHub, AWS CodeCommit, AWS CodePipeline, and Amazon S3 static cloud hosting.">
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700&family=Outfit:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body class="theme-nebula">
+    <!-- Background Ambient Glows -->
+    <div class="ambient-glow glow-1"></div>
+    <div class="ambient-glow glow-2"></div>
+    <div class="ambient-glow glow-3"></div>
+
+    <!-- Navigation Header -->
+    <header class="navbar" id="main-nav">
+        <div class="nav-container">
+            <div class="nav-brand">
+                <div class="brand-logo-icon">
+                    <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2">
+                        <polygon points="12 2 2 7 12 12 22 7 12 2"></polygon>
+                        <polyline points="2 17 12 22 22 17"></polyline>
+                        <polyline points="2 12 12 17 22 12"></polyline>
+                    </svg>
+                </div>
+                <div class="brand-text">
+                    <span class="brand-title">CloudOps <span class="accent-text">AutoDeploy</span></span>
+                    <span class="brand-badge">AWS CI/CD</span>
+                </div>
+            </div>
+
+            <nav class="nav-links">
+                <a href="#pipeline-flow" class="nav-link">Pipeline Architecture</a>
+                <a href="#live-metrics" class="nav-link">Telemetry</a>
+                <a href="#deploy-console" class="nav-link">Live Terminal</a>
+                <a href="#specs" class="nav-link">AWS Infrastructure</a>
+            </nav>
+
+            <div class="nav-actions">
+                <div class="status-indicator-pill">
+                    <span class="status-dot pulse"></span>
+                    <span class="status-label">Pipeline Active (us-east-1)</span>
+                </div>
+                <button id="theme-toggle-btn" class="icon-button" title="Switch Theme" aria-label="Toggle visual theme">
+                    <svg class="sun-icon" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2">
+                        <circle cx="12" cy="12" r="5"></circle>
+                        <line x1="12" y1="1" x2="12" y2="3"></line>
+                        <line x1="12" y1="21" x2="12" y2="23"></line>
+                        <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+                        <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+                        <line x1="1" y1="12" x2="3" y2="12"></line>
+                        <line x1="21" y1="12" x2="23" y2="12"></line>
+                        <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+                        <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+                    </svg>
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <main class="page-content">
+        <!-- Hero Section -->
+        <section class="hero-section" id="overview">
+            <div class="container hero-grid">
+                <div class="hero-copy">
+                    <div class="hero-chip">
+                        <span class="chip-dot"></span>
+                        <span>Zero-Downtime Continuous Delivery</span>
+                    </div>
+                    <h1 class="hero-headline">
+                        Automated Cloud Deployment via <span class="gradient-text">AWS CodePipeline</span> &amp; S3
+                    </h1>
+                    <p class="hero-subtext">
+                        A fully automated DevOps deployment lifecycle bridging GitHub version control with AWS native infrastructure:
+                        <strong>GitHub</strong> → <strong>AWS CodeCommit</strong> → <strong>AWS CodePipeline</strong> → <strong>Amazon S3 Bucket</strong>.
+                    </p>
+
+                    <div class="hero-cta-group">
+                        <button id="btn-trigger-deploy" class="btn btn-primary glow-button">
+                            <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2">
+                                <polygon points="5 3 19 12 5 21 5 3"></polygon>
+                            </svg>
+                            <span>Simulate Trigger &amp; Deploy</span>
+                        </button>
+                        <a href="#pipeline-flow" class="btn btn-secondary">
+                            <span>Explore Pipeline Graph</span>
+                            <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2">
+                                <line x1="7" y1="17" x2="17" y2="7"></line>
+                                <polyline points="7 7 17 7 17 17"></polyline>
+                            </svg>
+                        </a>
+                    </div>
+
+                    <!-- Quick Deployment Highlights -->
+                    <div class="hero-metrics-strip">
+                        <div class="mini-metric">
+                            <span class="mini-val" id="metric-uptime">99.99%</span>
+                            <span class="mini-lbl">Availability</span>
+                        </div>
+                        <div class="metric-divider"></div>
+                        <div class="mini-metric">
+                            <span class="mini-val" id="metric-duration">1.8s</span>
+                            <span class="mini-lbl">Sync Latency</span>
+                        </div>
+                        <div class="metric-divider"></div>
+                        <div class="mini-metric">
+                            <span class="mini-val">100%</span>
+                            <span class="mini-lbl">Automated</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Hero Interactive Hologram / Card -->
+                <div class="hero-card-container">
+                    <div class="glass-card hero-preview-card">
+                        <div class="card-header-bar">
+                            <div class="window-dots">
+                                <span class="dot dot-red"></span>
+                                <span class="dot dot-yellow"></span>
+                                <span class="dot dot-green"></span>
+                            </div>
+                            <span class="card-caption">pipeline-orchestrator.json</span>
+                            <span class="badge badge-success">SUCCEEDED</span>
+                        </div>
+                        <div class="code-preview-body">
+<pre><code><span class="tok-kw">"pipeline"</span>: {
+  <span class="tok-key">"name"</span>: <span class="tok-str">"devops-exam-pipeline"</span>,
+  <span class="tok-key">"roleArn"</span>: <span class="tok-str">"arn:aws:iam::...:role/PipelineRole"</span>,
+  <span class="tok-key">"source"</span>: {
+    <span class="tok-key">"provider"</span>: <span class="tok-str">"CodeCommit"</span>,
+    <span class="tok-key">"repository"</span>: <span class="tok-str">"devops-exam-repo"</span>,
+    <span class="tok-key">"branch"</span>: <span class="tok-str">"main"</span>
+  },
+  <span class="tok-key">"deploy"</span>: {
+    <span class="tok-key">"provider"</span>: <span class="tok-str">"S3"</span>,
+    <span class="tok-key">"targetBucket"</span>: <span class="tok-str">"devops-exam-site-956420554301"</span>,
+    <span class="tok-key">"extract"</span>: <span class="tok-bool">true</span>
+  }
+}</code></pre>
+                        </div>
+                        <div class="card-footer-stats">
+                            <div class="stat-pill"><span class="pill-dot green"></span> Source Synced</div>
+                            <div class="stat-pill"><span class="pill-dot green"></span> S3 Extracted</div>
+                            <div class="stat-pill"><span class="pill-dot blue"></span> Live Edge Online</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Pipeline Architecture Visualizer -->
+        <section class="section" id="pipeline-flow">
+            <div class="container">
+                <div class="section-header">
+                    <span class="section-tag">Continuous Delivery Flow</span>
+                    <h2 class="section-title">Automated 4-Tier Pipeline Architecture</h2>
+                    <p class="section-desc">Click any node below to inspect configuration, security boundaries, and telemetry.</p>
+                </div>
+
+                <div class="pipeline-track-wrapper">
+                    <!-- Progress Bar for Simulation -->
+                    <div class="pipeline-progress-bar" id="pipeline-progress"></div>
+
+                    <div class="pipeline-nodes-grid">
+                        <!-- Node 1: GitHub -->
+                        <div class="pipeline-node active" id="node-github" data-node="github">
+                            <div class="node-icon-box github-box">
+                                <svg viewBox="0 0 24 24" width="28" height="28" fill="currentColor">
+                                    <path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0024 12c0-6.63-5.37-12-12-12z"/>
+                                </svg>
+                            </div>
+                            <div class="node-tag">Stage 01</div>
+                            <h3 class="node-title">GitHub Repository</h3>
+                            <p class="node-sub">Source Control &amp; Triggers</p>
+                            <div class="node-status"><span class="badge badge-success">Branch: main</span></div>
+                        </div>
+
+                        <!-- Connector 1 -->
+                        <div class="pipeline-connector">
+                            <div class="connector-line">
+                                <span class="connector-dot"></span>
+                            </div>
+                            <span class="connector-label">Git Push Sync</span>
+                        </div>
+
+                        <!-- Node 2: AWS CodeCommit -->
+                        <div class="pipeline-node" id="node-codecommit" data-node="codecommit">
+                            <div class="node-icon-box codecommit-box">
+                                <svg viewBox="0 0 24 24" width="28" height="28" fill="none" stroke="currentColor" stroke-width="2">
+                                    <line x1="6" y1="3" x2="6" y2="15"></line>
+                                    <circle cx="18" cy="6" r="3"></circle>
+                                    <circle cx="6" cy="18" r="3"></circle>
+                                    <path d="M18 9a9 9 0 0 1-9 9"></path>
+                                </svg>
+                            </div>
+                            <div class="node-tag">Stage 02</div>
+                            <h3 class="node-title">AWS CodeCommit</h3>
+                            <p class="node-sub">Secure Cloud Git Remote</p>
+                            <div class="node-status"><span class="badge badge-neutral">devops-exam-repo</span></div>
+                        </div>
+
+                        <!-- Connector 2 -->
+                        <div class="pipeline-connector">
+                            <div class="connector-line">
+                                <span class="connector-dot"></span>
+                            </div>
+                            <span class="connector-label">Source Poll</span>
+                        </div>
+
+                        <!-- Node 3: AWS CodePipeline -->
+                        <div class="pipeline-node" id="node-codepipeline" data-node="codepipeline">
+                            <div class="node-icon-box codepipeline-box">
+                                <svg viewBox="0 0 24 24" width="28" height="28" fill="none" stroke="currentColor" stroke-width="2">
+                                    <polyline points="22 12 18 12 15 21 9 3 6 12 2 12"></polyline>
+                                </svg>
+                            </div>
+                            <div class="node-tag">Stage 03</div>
+                            <h3 class="node-title">AWS CodePipeline</h3>
+                            <p class="node-sub">Continuous Delivery Engine</p>
+                            <div class="node-status"><span class="badge badge-accent">Role: PipelineRole</span></div>
+                        </div>
+
+                        <!-- Connector 3 -->
+                        <div class="pipeline-connector">
+                            <div class="connector-line">
+                                <span class="connector-dot"></span>
+                            </div>
+                            <span class="connector-label">S3 Deploy (Extract)</span>
+                        </div>
+
+                        <!-- Node 4: S3 Bucket Hosting -->
+                        <div class="pipeline-node" id="node-s3" data-node="s3">
+                            <div class="node-icon-box s3-box">
+                                <svg viewBox="0 0 24 24" width="28" height="28" fill="none" stroke="currentColor" stroke-width="2">
+                                    <path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"></path>
+                                    <polyline points="3.27 6.96 12 12.01 20.73 6.96"></polyline>
+                                    <line x1="12" y1="22.08" x2="12" y2="12"></line>
+                                </svg>
+                            </div>
+                            <div class="node-tag">Stage 04</div>
+                            <h3 class="node-title">Amazon S3 Bucket</h3>
+                            <p class="node-sub">Static Web Storage</p>
+                            <div class="node-status"><span class="badge badge-success">devops-exam-site</span></div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Dynamic Node Detail Panel -->
+                <div class="node-detail-card glass-card" id="node-detail-panel">
+                    <div class="detail-header">
+                        <div class="detail-title-group">
+                            <span class="detail-chip" id="detail-chip">Selected: GitHub</span>
+                            <h3 class="detail-heading" id="detail-heading">GitHub Repository (KrishChothani/devops-exam)</h3>
+                        </div>
+                        <div class="detail-meta-actions">
+                            <span class="detail-status-badge badge badge-success" id="detail-status">SYNCHRONIZED</span>
+                        </div>
+                    </div>
+                    <div class="detail-content-grid">
+                        <div class="detail-prop">
+                            <span class="prop-label">Primary Endpoint / URL</span>
+                            <code class="prop-val" id="detail-endpoint">https://github.com/KrishChothani/devops-exam.git</code>
+                        </div>
+                        <div class="detail-prop">
+                            <span class="prop-label">Authentication Mechanism</span>
+                            <span class="prop-val" id="detail-auth">GitHub Personal Access Token / HTTPS Token Auth</span>
+                        </div>
+                        <div class="detail-prop">
+                            <span class="prop-label">Automation Trigger</span>
+                            <span class="prop-val" id="detail-trigger">Webhook / Push on branch 'main'</span>
+                        </div>
+                        <div class="detail-prop">
+                            <span class="prop-label">Artifact Delivery</span>
+                            <span class="prop-val" id="detail-artifact">Synchronized to CodeCommit &amp; CodePipeline</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Live Deployment Console & Terminal Simulator -->
+        <section class="section" id="deploy-console">
+            <div class="container">
+                <div class="section-header">
+                    <span class="section-tag">DevOps Execution Logs</span>
+                    <h2 class="section-title">Live Deployment Console</h2>
+                    <p class="section-desc">Stream deployment events, pipeline status checks, and AWS CLI diagnostics.</p>
+                </div>
+
+                <div class="terminal-window glass-card">
+                    <div class="terminal-header">
+                        <div class="window-controls">
+                            <span class="t-dot red"></span>
+                            <span class="t-dot yellow"></span>
+                            <span class="t-dot green"></span>
+                        </div>
+                        <div class="terminal-title">
+                            <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2">
+                                <polyline points="4 17 10 11 4 5"></polyline>
+                                <line x1="12" y1="19" x2="20" y2="19"></line>
+                            </svg>
+                            <span>aws-cli@pipeline-orchestrator:~ /var/log/codepipeline.log</span>
+                        </div>
+                        <div class="terminal-actions">
+                            <button id="btn-clear-term" class="terminal-btn" title="Clear console">Clear</button>
+                            <button id="btn-replay-term" class="terminal-btn primary" title="Replay execution logs">Re-run Pipeline</button>
+                        </div>
+                    </div>
+
+                    <div class="terminal-body" id="terminal-output">
+                        <!-- Simulated Real-time Log Stream -->
+                        <div class="log-line info"><span class="log-ts">[11:20:10]</span> [INIT] Initializing AWS session context (Region: us-east-1, Account: 956420554301)</div>
+                        <div class="log-line info"><span class="log-ts">[11:20:12]</span> [AUTH] Assumed Role: arn:aws:sts::956420554301:assumed-role/voclabs/user</div>
+                        <div class="log-line success"><span class="log-ts">[11:20:18]</span> [CODECOMMIT] Verified repository: 'devops-exam-repo' (Arn: arn:aws:codecommit:us-east-1:956420554301:devops-exam-repo)</div>
+                        <div class="log-line success"><span class="log-ts">[11:20:25]</span> [S3] Target S3 bucket verified: 'devops-exam-site-956420554301'</div>
+                        <div class="log-line success"><span class="log-ts">[11:20:31]</span> [S3] Artifact store initialized: 'devops-exam-artifacts-956420554301'</div>
+                        <div class="log-line info"><span class="log-ts">[11:20:44]</span> [PIPELINE] Role bound: arn:aws:iam::956420554301:role/PipelineRole</div>
+                        <div class="log-line highlight"><span class="log-ts">[11:21:00]</span> [PIPELINE] Creating pipeline 'devops-exam-pipeline' with CodeCommit source &amp; S3 deploy...</div>
+                        <div class="log-line success"><span class="log-ts">[11:21:05]</span> [DEPLOY] Static asset deployment package ready (index.html, style.css, script.js)</div>
+                        <div class="log-line success"><span class="log-ts">[11:21:06]</span> [READY] Pipeline is armed and listening for source commits on branch 'main'.</div>
+                    </div>
+
+                    <div class="terminal-footer">
+                        <span class="prompt-symbol">$</span>
+                        <input type="text" id="terminal-input" placeholder="Type 'help', 'status', 'deploy', 'specs', or 'clear'..." autocomplete="off">
+                        <button id="terminal-send" class="terminal-send-btn">Send</button>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- DevOps Telemetry & Health Dashboard -->
+        <section class="section" id="live-metrics">
+            <div class="container">
+                <div class="section-header">
+                    <span class="section-tag">Continuous Reliability</span>
+                    <h2 class="section-title">DevOps Performance Benchmarks</h2>
+                    <p class="section-desc">Key continuous integration and deployment metrics across our AWS cloud infrastructure.</p>
+                </div>
+
+                <div class="metrics-grid">
+                    <div class="glass-card metric-card">
+                        <div class="card-glow-edge"></div>
+                        <div class="metric-top">
+                            <span class="metric-icon-wrap cyan">
+                                <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2">
+                                    <circle cx="12" cy="12" r="10"></circle>
+                                    <polyline points="12 6 12 12 16 14"></polyline>
+                                </svg>
+                            </span>
+                            <span class="metric-badge-trend positive">⚡ Optimized</span>
+                        </div>
+                        <div class="metric-num" id="metric-leadtime">&lt; 30s</div>
+                        <div class="metric-name">Deployment Lead Time</div>
+                        <p class="metric-hint">Duration from Git push on GitHub/CodeCommit to live S3 extraction.</p>
+                    </div>
+
+                    <div class="glass-card metric-card">
+                        <div class="card-glow-edge"></div>
+                        <div class="metric-top">
+                            <span class="metric-icon-wrap violet">
+                                <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2">
+                                    <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>
+                                    <polyline points="22 4 12 14.01 9 11.01"></polyline>
+                                </svg>
+                            </span>
+                            <span class="metric-badge-trend positive">100% Success</span>
+                        </div>
+                        <div class="metric-num" id="metric-successrate">0.0%</div>
+                        <div class="metric-name">Change Failure Rate</div>
+                        <p class="metric-hint">Zero failed stages detected across all pipeline deployment cycles.</p>
+                    </div>
+
+                    <div class="glass-card metric-card">
+                        <div class="card-glow-edge"></div>
+                        <div class="metric-top">
+                            <span class="metric-icon-wrap amber">
+                                <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2">
+                                    <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon>
+                                </svg>
+                            </span>
+                            <span class="metric-badge-trend positive">Continuous</span>
+                        </div>
+                        <div class="metric-num" id="metric-freq">On-Commit</div>
+                        <div class="metric-name">Deployment Frequency</div>
+                        <p class="metric-hint">Automatic event-driven triggers on any code commit to repository.</p>
+                    </div>
+
+                    <div class="glass-card metric-card">
+                        <div class="card-glow-edge"></div>
+                        <div class="metric-top">
+                            <span class="metric-icon-wrap green">
+                                <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2">
+                                    <rect x="2" y="3" width="20" height="14" rx="2" ry="2"></rect>
+                                    <line x1="8" y1="21" x2="16" y2="21"></line>
+                                    <line x1="12" y1="17" x2="12" y2="21"></line>
+                                </svg>
+                            </span>
+                            <span class="metric-badge-trend positive">Serverless</span>
+                        </div>
+                        <div class="metric-num">S3 Static</div>
+                        <div class="metric-name">Hosting Architecture</div>
+                        <p class="metric-hint">Zero server maintenance, elastic autoscaling, 11 9s durability.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Infrastructure & Security Specification -->
+        <section class="section" id="specs">
+            <div class="container">
+                <div class="section-header">
+                    <span class="section-tag">AWS Cloud Configuration</span>
+                    <h2 class="section-title">Infrastructure Specifications</h2>
+                    <p class="section-desc">Technical parameters configured in AWS Learner Lab account 956420554301.</p>
+                </div>
+
+                <div class="specs-grid">
+                    <div class="glass-card spec-card">
+                        <div class="spec-card-header">
+                            <div class="spec-icon s3-icon">S3</div>
+                            <h4 class="spec-card-title">Amazon S3 Storage</h4>
+                        </div>
+                        <ul class="spec-list">
+                            <li><span class="k">Hosting Bucket:</span> <code class="v">devops-exam-site-956420554301</code></li>
+                            <li><span class="k">Artifact Bucket:</span> <code class="v">devops-exam-artifacts-956420554301</code></li>
+                            <li><span class="k">AWS Region:</span> <span class="v">us-east-1 (N. Virginia)</span></li>
+                            <li><span class="k">Object Versioning:</span> <span class="v">Enabled</span></li>
+                            <li><span class="k">Deployment Action:</span> <span class="v">Extract: true (Unzips artifacts)</span></li>
+                        </ul>
+                    </div>
+
+                    <div class="glass-card spec-card">
+                        <div class="spec-card-header">
+                            <div class="spec-icon pipe-icon">CP</div>
+                            <h4 class="spec-card-title">AWS CodePipeline</h4>
+                        </div>
+                        <ul class="spec-list">
+                            <li><span class="k">Pipeline Name:</span> <code class="v">devops-exam-pipeline</code></li>
+                            <li><span class="k">IAM Service Role:</span> <code class="v">PipelineRole</code></li>
+                            <li><span class="k">Stages:</span> <span class="v">Source (CodeCommit) → Deploy (S3)</span></li>
+                            <li><span class="k">Poll Mode:</span> <span class="v">PollForSourceChanges: true</span></li>
+                            <li><span class="k">Trigger Latency:</span> <span class="v">&lt; 60 seconds</span></li>
+                        </ul>
+                    </div>
+
+                    <div class="glass-card spec-card">
+                        <div class="spec-card-header">
+                            <div class="spec-icon git-icon">CC</div>
+                            <h4 class="spec-card-title">CodeCommit &amp; GitHub</h4>
+                        </div>
+                        <ul class="spec-list">
+                            <li><span class="k">GitHub Repo:</span> <a href="https://github.com/KrishChothani/devops-exam" target="_blank" rel="noopener" class="v link">KrishChothani/devops-exam</a></li>
+                            <li><span class="k">CodeCommit Repo:</span> <code class="v">devops-exam-repo</code></li>
+                            <li><span class="k">Default Branch:</span> <span class="v">main</span></li>
+                            <li><span class="k">Auth Helper:</span> <span class="v">aws codecommit credential-helper</span></li>
+                            <li><span class="k">Automation:</span> <span class="v">GitHub Action / Remote Mirroring</span></li>
+                        </ul>
+                    </div>
+
+                    <div class="glass-card spec-card">
+                        <div class="spec-card-header">
+                            <div class="spec-icon iam-icon">IAM</div>
+                            <h4 class="spec-card-title">Security &amp; IAM Roles</h4>
+                        </div>
+                        <ul class="spec-list">
+                            <li><span class="k">Pipeline Role ARN:</span> <code class="v">arn:aws:iam::956420554301:role/PipelineRole</code></li>
+                            <li><span class="k">Deploy Role ARN:</span> <code class="v">arn:aws:iam::956420554301:role/DeployRole</code></li>
+                            <li><span class="k">Assumed Role:</span> <code class="v">voclabs / Learner Lab</code></li>
+                            <li><span class="k">S3 Policy:</span> <span class="v">AmazonS3FullAccess (Attached to Pipeline)</span></li>
+                            <li><span class="k">Least Privilege:</span> <span class="v">Scoped Service Principals</span></li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Author / Engineering Profile -->
+        <section class="section">
+            <div class="container">
+                <div class="glass-card author-card">
+                    <div class="author-avatar">
+                        <img src="https://avatars.githubusercontent.com/u/143370415?v=4" alt="Krish Chothani" width="80" height="80">
+                    </div>
+                    <div class="author-info">
+                        <div class="author-badge">DevOps &amp; Cloud Engineering</div>
+                        <h3 class="author-name">Krish Chothani</h3>
+                        <p class="author-bio">Nirma University · Competitive Programmer &amp; Full Stack / Cloud Architect.</p>
+                        <div class="author-links">
+                            <a href="https://github.com/KrishChothani" target="_blank" rel="noopener" class="author-link">
+                                <svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor">
+                                    <path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0024 12c0-6.63-5.37-12-12-12z"/>
+                                </svg>
+                                <span>GitHub Profile</span>
+                            </a>
+                            <a href="https://github.com/KrishChothani/devops-exam" target="_blank" rel="noopener" class="author-link highlight">
+                                <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2">
+                                    <path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 0 0-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0 0 20 4.77 5.07 5.07 0 0 0 19.91 1S18.73.65 16 2.48a13.38 13.38 0 0 0-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 0 0 5 4.77a5.44 5.44 0 0 0-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 0 0 9 18.13V22"></path>
+                                </svg>
+                                <span>devops-exam Repository</span>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- Footer -->
+    <footer class="page-footer">
+        <div class="container footer-content">
+            <div class="footer-left">
+                <p>&copy; 2026 CloudOps Automated Platform. Deployed with AWS CodePipeline &amp; S3.</p>
+                <p class="footer-sub">AWS Region: us-east-1 &bull; Account: 956420554301 &bull; Automated CI/CD Engine</p>
+            </div>
+            <div class="footer-right">
+                <span class="deploy-timestamp" id="footer-build-time">Last Build: Oct 2026 (Continuous)</span>
+            </div>
+        </div>
+    </footer>
+
+    <script src="script.js"></script>
+</body>
+</html>
